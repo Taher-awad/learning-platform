@@ -38,16 +38,20 @@ Located at `.github/workflows/ci_cd.yml`, the pipeline automates the "Test -> Bu
 
 1. **Automated Testing**: 
    - Runs on every `push` and `pull_request` to `main`.
-   - Executes a comprehensive `pytest` suite covering unit and integration logic.
+   - Executes a comprehensive `pytest` suite covering unit and operational logic.
 2. **Docker Build & Push**:
    - Authenticates with Amazon ECR.
    - Builds optimized Docker images for all microservices.
-   - Tags images with both the Git SHA and `latest` for traceability.
-   - Pushes images to a version-controlled registry (ECR).
 3. **Automated ECS Deployment**:
    - Triggered only on successful `push` to `main`.
-   - Forces a new deployment of all ECS services to pull the latest images.
-   - Supports **Blue/Green Deployment** via CodeDeploy for the Chat Service, ensuring zero-downtime updates and easy rollbacks.
+   - Forces a new deployment of all ECS services.
+
+> [!IMPORTANT]
+> **To enable automated deployments**, you must add your AWS credentials to your GitHub Repository Secrets:
+> 1. Go to `Settings` > `Secrets and variables` > `Actions`.
+> 2. Add `AWS_ACCESS_KEY_ID`: Your IAM user access key.
+> 3. Add `AWS_SECRET_ACCESS_KEY`: Your IAM user secret key.
+> 4. Ensure your IAM user has the `AdministratorAccess` or specific ECR/ECS permissions.
 
 ## 📂 Repository Structure
 
