@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import pytest
+pytestmark = pytest.mark.integration
 """
 Test script for Document Service
 Demonstrates document upload, S3 storage, and notes generation
@@ -7,7 +9,7 @@ import requests
 import json
 import time
 
-ALB_DNS = "learning-platform-alb-162703705.us-east-1.elb.amazonaws.com"
+ALB_DNS = "learning-platform-alb-328625304.us-east-1.elb.amazonaws.com"
 BASE_URL = f"http://{ALB_DNS}"
 
 class Colors:

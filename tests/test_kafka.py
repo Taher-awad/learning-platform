@@ -1,3 +1,5 @@
+import pytest
+pytestmark = pytest.mark.integration
 from confluent_kafka.admin import AdminClient
 import os
 import sys

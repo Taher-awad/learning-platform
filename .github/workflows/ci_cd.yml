@@ -40,10 +40,9 @@ jobs:
 
     - name: Run Tests
       run: |
-        # Run tests excluding those that require real AWS/Gemini credentials if not available
-        # checking for tests folder
+        # Run safe unit tests, skipping integration tests that require live AWS infra
         if [ -d "tests" ]; then
-          pytest tests/ --ignore=tests/test_tts_direct.py --ignore=tests/test_gemini_keys.py
+          pytest tests/ -m "not integration"
         fi
 
   build-and-deploy:

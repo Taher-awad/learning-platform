@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import pytest
+pytestmark = pytest.mark.integration
 """
 Direct TTS Test - Bypasses Kafka, tests ElevenLabs API directly
 This test synthesizes speech and plays it locally

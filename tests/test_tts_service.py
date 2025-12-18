@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import pytest
+pytestmark = pytest.mark.integration
 """
 Test script for TTS (Text-to-Speech) Service on AWS
 Tests the deployed service, with direct API fallback for demo
@@ -10,7 +12,7 @@ import subprocess
 import os
 import tempfile
 
-ALB_DNS = "learning-platform-alb-162703705.us-east-1.elb.amazonaws.com"
+ALB_DNS = "learning-platform-alb-328625304.us-east-1.elb.amazonaws.com"
 BASE_URL = f"http://{ALB_DNS}"
 ELEVENLABS_API_KEY = "sk_ce8d69513338b3010ee8eef3cc1616ef1ca1ad520340fce7"
 

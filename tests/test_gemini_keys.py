@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import pytest
+pytestmark = pytest.mark.integration
 """
 Test script to check all Gemini API keys with different models
 """
