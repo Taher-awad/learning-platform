@@ -1,0 +1,96 @@
+name: Learning Platform CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY_PREFIX: phase2
+  ECS_CLUSTER: learning-platform-cluster
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Run Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.11"
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest httpx
+        # Install dependencies for all services
+        for service in services/*/; do
+          if [ -f "${service}requirements.txt" ]; then
+            pip install -r "${service}requirements.txt"
+          fi
+        done
+
+    - name: Run Tests
+      run: |
+        # Run tests excluding those that require real AWS/Gemini credentials if not available
+        # checking for tests folder
+        if [ -d "tests" ]; then
+          pytest tests/ --ignore=tests/test_tts_direct.py --ignore=tests/test_gemini_keys.py
+        fi
+
+  build-and-deploy:
+    name: Build and Deploy to ECS
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push images
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        # Loop through services
+        SERVICES="auth-service chat-service document-service quiz-service tts-service stt-service api-gateway"
+        
+        for svc in $SERVICES; do
+          echo "Building $svc..."
+          docker build -t $ECR_REGISTRY/${ECR_REPOSITORY_PREFIX}/$svc:$IMAGE_TAG -f services/$svc/Dockerfile ./services/$svc
+          docker push $ECR_REGISTRY/${ECR_REPOSITORY_PREFIX}/$svc:$IMAGE_TAG
+          # Also push 'latest' for simplicity
+          docker tag $ECR_REGISTRY/${ECR_REPOSITORY_PREFIX}/$svc:$IMAGE_TAG $ECR_REGISTRY/${ECR_REPOSITORY_PREFIX}/$svc:latest
+          docker push $ECR_REGISTRY/${ECR_REPOSITORY_PREFIX}/$svc:latest
+        done
+
+    - name: Update ECS Services
+      run: |
+        SERVICES="auth-service chat-service document-service quiz-service tts-service stt-service api-gateway"
+        
+        for svc in $SERVICES; do
+          echo "Updating service $svc..."
+          aws ecs update-service --cluster $ECS_CLUSTER --service $svc --force-new-deployment
+        done
+
+

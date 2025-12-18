@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+confluent-kafka
+psycopg2-binary
+sqlalchemy
+pydantic
+pydantic-settings
+redis
+google-generativeai
+pytest
+httpx

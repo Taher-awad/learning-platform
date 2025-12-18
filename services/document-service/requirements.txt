@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+python-multipart
+minio
+confluent-kafka
+psycopg2-binary
+sqlalchemy
+pydantic
+pydantic-settings
+python-docx
+pypdf
+pytest
+httpx
+google-generativeai
+boto3

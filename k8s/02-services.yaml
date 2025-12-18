@@ -1,0 +1,188 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tts-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tts-service
+  template:
+    metadata:
+      labels:
+        app: tts-service
+    spec:
+      containers:
+      - name: tts-service
+        image: phase2-tts-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+        env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: "kafka:29092"
+        - name: MINIO_ENDPOINT
+          value: "minio:9000"
+        - name: ELEVENLABS_API_KEY
+          value: "your_key"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tts-service
+spec:
+  ports:
+  - port: 8000
+    targetPort: 8000
+  selector:
+    app: tts-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stt-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: stt-service
+  template:
+    metadata:
+      labels:
+        app: stt-service
+    spec:
+      containers:
+      - name: stt-service
+        image: phase2-stt-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+        env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: "kafka:29092"
+        - name: MINIO_ENDPOINT
+          value: "minio:9000"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stt-service
+spec:
+  ports:
+  - port: 8000
+    targetPort: 8000
+  selector:
+    app: stt-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chat-service
+  template:
+    metadata:
+      labels:
+        app: chat-service
+    spec:
+      containers:
+      - name: chat-service
+        image: phase2-chat-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+        env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: "kafka:29092"
+        - name: REDIS_HOST
+          value: "redis"
+        - name: GOOGLE_API_KEY
+          value: "your_key"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat-service
+spec:
+  ports:
+  - port: 8000
+    targetPort: 8000
+  selector:
+    app: chat-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: document-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: document-service
+  template:
+    metadata:
+      labels:
+        app: document-service
+    spec:
+      containers:
+      - name: document-service
+        image: phase2-document-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+        env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: "kafka:29092"
+        - name: MINIO_ENDPOINT
+          value: "minio:9000"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: document-service
+spec:
+  ports:
+  - port: 8000
+    targetPort: 8000
+  selector:
+    app: document-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quiz-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: quiz-service
+  template:
+    metadata:
+      labels:
+        app: quiz-service
+    spec:
+      containers:
+      - name: quiz-service
+        image: phase2-quiz-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+        env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: "kafka:29092"
+        - name: GOOGLE_API_KEY
+          value: "your_key"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: quiz-service
+spec:
+  ports:
+  - port: 8000
+    targetPort: 8000
+  selector:
+    app: quiz-service

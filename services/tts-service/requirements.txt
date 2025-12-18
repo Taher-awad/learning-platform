@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+confluent-kafka
+minio
+pydantic
+pydantic-settings
+requests
+pytest
+httpx
+boto3

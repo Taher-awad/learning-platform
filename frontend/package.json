@@ -1,0 +1,12 @@
+{
+  "name": "learning-platform-gui",
+  "version": "1.0.0",
+  "description": "Simple GUI for Learning Platform",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

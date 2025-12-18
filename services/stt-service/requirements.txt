@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+confluent-kafka
+boto3
+psycopg2-binary
+sqlalchemy
+pydantic
+pydantic-settings
+SpeechRecognition
+pydub
+python-multipart
+pytest
+httpx

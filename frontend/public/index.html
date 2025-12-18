@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #eee;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card h2 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card h2 span {
+            font-size: 1.4rem;
+        }
+
+        input,
+        textarea,
+        button,
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #888;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        select option {
+            background: #1a1a2e;
+            color: #fff;
+        }
+
+        button {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .response {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            margin-left: 10px;
+        }
+
+        .status.success {
+            background: #10b981;
+        }
+
+        .status.error {
+            background: #ef4444;
+        }
+
+        .status.pending {
+            background: #f59e0b;
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .row input,
+        .row select {
+            flex: 1;
+        }
+
+        .row button {
+            width: auto;
+            padding: 12px 24px;
+        }
+
+        #chat-messages {
+            max-height: 250px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            min-height: 60px;
+        }
+
+        .message {
+            padding: 10px 15px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            max-width: 80%;
+        }
+
+        .message.user {
+            background: #667eea;
+            margin-left: auto;
+        }
+
+        .message.assistant {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        audio {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 700px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .file-label {
+            display: block;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+
+        .file-label:hover {
+            border-color: #667eea;
+        }
+
+        .quiz-question {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .quiz-question h4 {
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        .quiz-option {
+            display: block;
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .quiz-option:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .quiz-option.selected {
+            background: #667eea;
+        }
+
+        .quiz-option.correct {
+            background: #10b981;
+        }
+
+        .quiz-option.wrong {
+            background: #ef4444;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .tab.active {
+            background: #667eea;
+            border-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 Learning Platform</h1>
+            <p class="subtitle">AWS Microservices Demo • Full-Stack AI-Powered Learning</p>
+        </header>
+
+        <!-- Auth Section -->
+        <div class="card">
+            <h2><span>🔐</span> Authentication <span id="auth-status" class="status pending">Not logged in</span></h2>
+            <div class="grid">
+                <div>
+                    <input type="email" id="email" placeholder="Email">
+                    <input type="password" id="password" placeholder="Password">
+                    <input type="text" id="fullname" placeholder="Full Name (for registration)">
+                </div>
+                <div>
+                    <button onclick="register()">Register</button>
+                    <button onclick="login()">Login</button>
+                </div>
+            </div>
+            <div id="auth-response" class="response" style="display:none;"></div>
+        </div>
+
+        <!-- Document Section -->
+        <div class="card">
+            <h2><span>📄</span> Document Upload</h2>
+            <div class="file-input-wrapper">
+                <label class="file-label" id="doc-label">📁 Click or drag to upload a document (PDF, TXT, DOCX)</label>
+                <input type="file" id="doc-file" accept=".pdf,.txt,.docx,.doc"
+                    onchange="updateFileLabel(this, 'doc-label')">
+            </div>
+            <button onclick="uploadDocument()">Upload & Process Document</button>
+            <div id="doc-result"></div>
+        </div>
+
+        <!-- Quiz Section -->
+        <div class="card">
+            <h2><span>📝</span> Quiz Generator</h2>
+            <div class="tabs">
+                <div class="tab active" onclick="switchQuizTab('text')">From Text</div>
+                <div class="tab" onclick="switchQuizTab('document')">From Document</div>
+            </div>
+            <div id="quiz-tab-text" class="tab-content active">
+                <textarea id="quiz-text" rows="4" placeholder="Enter text content to generate quiz from..."></textarea>
+            </div>
+            <div id="quiz-tab-document" class="tab-content">
+                <select id="quiz-doc-select">
+                    <option value="">Select an uploaded document...</option>
+                </select>
+            </div>
+            <div class="row">
+                <select id="quiz-count">
+                    <option value="3">3 Questions</option>
+                    <option value="5" selected>5 Questions</option>
+                    <option value="10">10 Questions</option>
+                </select>
+                <button onclick="generateQuiz()">Generate Quiz</button>
+            </div>
+            <div id="quiz-container"></div>
+        </div>
+
+        <!-- Chat Section -->
+        <div class="card">
+            <h2><span>💬</span> AI Chat</h2>
+            <div id="chat-messages"></div>
+            <div class="row">
+                <input type="text" id="chat-input" placeholder="Ask me anything..."
+                    onkeypress="if(event.key==='Enter')sendChat()">
+                <button onclick="sendChat()">Send</button>
+            </div>
+        </div>
+
+        <!-- TTS Section -->
+        <div class="card">
+            <h2><span>🔊</span> Text-to-Speech</h2>
+            <textarea id="tts-text" rows="3"
+                placeholder="Enter text to convert to speech...">Hello! This is a test of the text to speech service.</textarea>
+            <button onclick="synthesizeSpeech()">Generate Speech</button>
+            <div id="tts-result"></div>
+        </div>
+
+        <!-- STT Section -->
+        <div class="card">
+            <h2><span>🎤</span> Speech-to-Text</h2>
+            <div class="file-input-wrapper">
+                <label class="file-label" id="audio-label">🎵 Click or drag to upload an audio file (MP3, WAV,
+                    M4A)</label>
+                <input type="file" id="audio-file" accept=".mp3,.wav,.m4a,.ogg,.webm"
+                    onchange="updateFileLabel(this, 'audio-label')">
+            </div>
+            <button onclick="transcribeAudio()">Transcribe Audio</button>
+            <div id="stt-result"></div>
+        </div>
+
+        <!-- Status Section -->
+        <div class="card">
+            <h2><span>📊</span> Service Status</h2>
+            <button onclick="checkHealth()">Check All Services</button>
+            <div id="health-response" class="response" style="display:none;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Detect HTTPS and warn/redirect (ALB doesn't have SSL yet)
+        if (window.location.protocol === 'https:' && window.location.hostname.includes('s3')) {
+            const httpUrl = window.location.href.replace('https://', 'http://').replace('.s3.amazonaws.com', '.s3-website-us-east-1.amazonaws.com').replace('/index.html', '');
+            if (confirm('This site requires HTTP (no SSL on backend yet).\\n\\nClick OK to redirect to HTTP version.')) {
+                window.location.href = httpUrl;
+            }
+        }
+
+        const API_BASE = 'http://learning-platform-alb-328625304.us-east-1.elb.amazonaws.com';
+        const ELEVENLABS_KEY = 'sk_ce8d69513338b3010ee8eef3cc1616ef1ca1ad520340fce7';
+        // Gemini API Keys (with automatic fallback)
+        const GEMINI_KEYS = [
+            'AIzaSyBt_azQNz0w-vcyNEQu-tbB__pKIri6EpU',
+            'AIzaSyB25zw74hDNbUx_JUL3sN4Amd6qJNx4jeg',
+            'AIzaSyAf45h6lMrmnBQYDQz4PQ40ExkZB_Dvqj4'
+        ];
+        let currentGeminiKeyIndex = 0;
+        let authToken = null;
+        let uploadedDocuments = [];
+
+
+        // Utility Functions
+        function showResponse(elementId, data, isError = false) {
+            const el = document.getElementById(elementId);
+            el.style.display = 'block';
+            el.textContent = typeof data === 'object' ? JSON.stringify(data, null, 2) : data;
+            el.style.borderLeft = isError ? '3px solid #ef4444' : '3px solid #10b981';
+        }
+
+        function setAuthStatus(status, type) {
+            const el = document.getElementById('auth-status');
+            el.textContent = status;
+            el.className = 'status ' + type;
+        }
+
+        function updateFileLabel(input, labelId) {
+            const label = document.getElementById(labelId);
+            if (input.files.length > 0) {
+                label.textContent = '✓ ' + input.files[0].name;
+                label.style.borderColor = '#10b981';
+            }
+        }
+
+        function switchQuizTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('quiz-tab-' + tab).classList.add('active');
+        }
+
+        // Auth Functions
+        async function register() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const fullName = document.getElementById('fullname').value;
+
+            try {
+                const res = await fetch(`${API_BASE}/api/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, full_name: fullName })
+                });
+                const data = await res.json();
+                showResponse('auth-response', data, !res.ok);
+                if (res.ok) setAuthStatus('Registered!', 'success');
+            } catch (e) {
+                showResponse('auth-response', 'Error: ' + e.message, true);
+            }
+        }
+
+        async function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const res = await fetch(`${API_BASE}/api/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                showResponse('auth-response', data, !res.ok);
+
+                if (res.ok && data.access_token) {
+                    authToken = data.access_token;
+                    setAuthStatus('Logged in ✓', 'success');
+                }
+            } catch (e) {
+                showResponse('auth-response', 'Error: ' + e.message, true);
+            }
+        }
+
+        // Document Functions
+        async function uploadDocument() {
+            const fileInput = document.getElementById('doc-file');
+            const resultDiv = document.getElementById('doc-result');
+
+            if (!fileInput.files.length) {
+                resultDiv.innerHTML = '<p style="color:#ef4444">Please select a file first</p>';
+                return;
+            }
+
+            if (!authToken) {
+                resultDiv.innerHTML = '<p style="color:#ef4444">Please login first</p>';
+                return;
+            }
+
+            resultDiv.innerHTML = '<p style="color:#f59e0b">⏳ Uploading and processing...</p>';
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                const res = await fetch(`${API_BASE}/api/documents/upload`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${authToken}` },
+                    body: formData
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    uploadedDocuments.push({
+                        id: data.document_id || data.id,
+                        name: fileInput.files[0].name
+                    });
+                    updateDocumentSelect();
+                    resultDiv.innerHTML = `<p style="color:#10b981">✓ Document uploaded successfully!</p>
+                        <p>ID: ${data.document_id || data.id}</p>`;
+                } else {
+                    const error = await res.text();
+                    resultDiv.innerHTML = `<p style="color:#ef4444">Error: ${res.status}</p>`;
+                }
+            } catch (e) {
+                resultDiv.innerHTML = `<p style="color:#ef4444">Error: ${e.message}</p>`;
+            }
+        }
+
+        function updateDocumentSelect() {
+            const select = document.getElementById('quiz-doc-select');
+            select.innerHTML = '<option value="">Select an uploaded document...</option>';
+            uploadedDocuments.forEach(doc => {
+                select.innerHTML += `<option value="${doc.id}">${doc.name}</option>`;
+            });
+        }
+
+        // Quiz Functions
+        async function generateQuiz() {
+            const container = document.getElementById('quiz-container');
+            const count = document.getElementById('quiz-count').value;
+            const textTab = document.getElementById('quiz-tab-text').classList.contains('active');
+
+            let content = '';
+            if (textTab) {
+                content = document.getElementById('quiz-text').value;
+                if (!content.trim()) {
+                    container.innerHTML = '<p style="color:#ef4444">Please enter some text</p>';
+                    return;
+                }
+            } else {
+                const docId = document.getElementById('quiz-doc-select').value;
+                if (!docId) {
+                    container.innerHTML = '<p style="color:#ef4444">Please select a document</p>';
+                    return;
+                }
+                content = `[Document ID: ${docId}]`;
+            }
+
+            container.innerHTML = '<p style="color:#f59e0b">⏳ Generating quiz...</p>';
+
+            // Try API first, then fallback to local generation
+            try {
+                if (authToken) {
+                    const res = await fetch(`${API_BASE}/api/quiz/generate`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`
+                        },
+                        body: JSON.stringify({
+                            content: content,
+                            num_questions: parseInt(count)
+                        })
+                    });
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.questions) {
+                            renderQuiz(data.questions);
+                            return;
+                        }
+                    }
+                }
+
+                // Fallback: Generate locally using Gemini API
+                await generateQuizLocally(content, count);
+            } catch (e) {
+                container.innerHTML = `<p style="color:#ef4444">Error: ${e.message}</p>`;
+            }
+        }
+
+        async function generateQuizLocally(content, count) {
+            const container = document.getElementById('quiz-container');
+
+            const prompt = `Generate ${count} multiple choice questions based on this content. Return ONLY valid JSON in this exact format:
+{"questions":[{"question":"...","options":["A","B","C","D"],"correct":0}]}
+Content: ${content.substring(0, 2000)}`;
+
+            for (let i = 0; i < GEMINI_KEYS.length; i++) {
+                const key = GEMINI_KEYS[(currentGeminiKeyIndex + i) % GEMINI_KEYS.length];
+                if (!key) continue;
+
+                try {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemma-3-4b-it:generateContent?key=${key}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts: [{ text: prompt }] }]
+                        })
+                    });
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                        const jsonMatch = text.match(/\{[\s\S]*\}/);
+                        if (jsonMatch) {
+                            const quiz = JSON.parse(jsonMatch[0]);
+                            renderQuiz(quiz.questions);
+                            currentGeminiKeyIndex = (currentGeminiKeyIndex + i) % GEMINI_KEYS.length;
+                            return;
+                        }
+                    } else if (res.status === 429) {
+                        continue; // Try next key
+                    }
+                } catch (e) {
+                    continue;
+                }
+            }
+
+            container.innerHTML = '<p style="color:#ef4444">⚠️ All AI services are rate limited. Please try again later.</p>';
+        }
+
+        function renderQuiz(questions) {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = '';
+
+            questions.forEach((q, qi) => {
+                const div = document.createElement('div');
+                div.className = 'quiz-question';
+                div.innerHTML = `<h4>Q${qi + 1}: ${q.question}</h4>`;
+
+                q.options.forEach((opt, oi) => {
+                    const optDiv = document.createElement('div');
+                    optDiv.className = 'quiz-option';
+                    optDiv.textContent = opt;
+                    optDiv.onclick = () => checkAnswer(optDiv, oi === q.correct, div);
+                    div.appendChild(optDiv);
+                });
+
+                container.appendChild(div);
+            });
+        }
+
+        function checkAnswer(element, isCorrect, questionDiv) {
+            questionDiv.querySelectorAll('.quiz-option').forEach(opt => {
+                opt.style.pointerEvents = 'none';
+            });
+            element.classList.add(isCorrect ? 'correct' : 'wrong');
+            if (!isCorrect) {
+                // Highlight correct answer
+                const correct = questionDiv.querySelector('.quiz-option:nth-child(' + (2) + ')');
+            }
+        }
+
+        // Chat Functions
+        function addMessage(text, isUser) {
+            const container = document.getElementById('chat-messages');
+            const msg = document.createElement('div');
+            msg.className = 'message ' + (isUser ? 'user' : 'assistant');
+            msg.textContent = text;
+            container.appendChild(msg);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function sendChat() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            addMessage(message, true);
+            input.value = '';
+
+            if (!authToken) {
+                addMessage('Please login first to use the chat.', false);
+                return;
+            }
+
+            addMessage('⏳ Thinking...', false);
+
+            let response = null;
+            let useLocalFallback = false;
+
+            // Try AWS backend first
+            try {
+                const userId = document.getElementById('email').value || 'user-' + Date.now();
+
+                const res = await fetch(`${API_BASE}/api/chat/message`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ user_id: userId, message: message })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    response = data.response;
+                } else {
+                    const error = await res.text();
+                    if (error.includes('429') || error.includes('quota') || error.includes('rate')) {
+                        useLocalFallback = true;
+                    } else {
+                        response = 'Error: ' + res.status;
+                    }
+                }
+            } catch (e) {
+                useLocalFallback = true;
+            }
+
+            // Fallback: Use local Gemini API with 3 keys
+            if (useLocalFallback) {
+                response = await chatWithLocalGemini(message);
+            }
+
+            // Remove "Thinking..." message
+            const messages = document.getElementById('chat-messages');
+            if (messages.lastChild?.textContent?.includes('Thinking')) {
+                messages.removeChild(messages.lastChild);
+            }
+
+            addMessage(response || 'Sorry, I could not process your request.', false);
+        }
+
+        async function chatWithLocalGemini(message) {
+            // Gemma 3 models work best on free tier (tested and confirmed)
+            const models = ['gemma-3-1b-it', 'gemma-3-4b-it'];
+
+            for (let i = 0; i < GEMINI_KEYS.length; i++) {
+                const keyIndex = (currentGeminiKeyIndex + i) % GEMINI_KEYS.length;
+                const key = GEMINI_KEYS[keyIndex];
+                if (!key) continue;
+
+                for (const model of models) {
+                    try {
+                        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                contents: [{ parts: [{ text: message }] }]
+                            })
+                        });
+
+                        if (res.ok) {
+                            const data = await res.json();
+                            const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                            if (text) {
+                                currentGeminiKeyIndex = keyIndex;
+                                return text;
+                            }
+                        } else if (res.status === 429) {
+                            console.log(`Key ${keyIndex + 1} / ${model} rate limited, trying next...`);
+                            continue;
+                        }
+                    } catch (e) {
+                        continue;
+                    }
+                }
+            }
+            return '⚠️ All AI services are currently rate limited. Please try again in a minute.';
+        }
+
+
+
+        // TTS Functions
+        async function synthesizeSpeech() {
+            const text = document.getElementById('tts-text').value;
+            const resultDiv = document.getElementById('tts-result');
+
+            resultDiv.innerHTML = '<p style="color:#f59e0b">⏳ Generating speech...</p>';
+
+            try {
+                const res = await fetch('https://api.elevenlabs.io/v1/text-to-speech/21m00Tcm4TlvDq8ikWAM', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'audio/mpeg',
+                        'Content-Type': 'application/json',
+                        'xi-api-key': ELEVENLABS_KEY
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        model_id: 'eleven_flash_v2_5',
+                        voice_settings: { stability: 0.5, similarity_boost: 0.5 }
+                    })
+                });
+
+                if (res.ok) {
+                    const blob = await res.blob();
+                    const url = URL.createObjectURL(blob);
+                    resultDiv.innerHTML = `
+                        <p style="color:#10b981">✓ Audio generated (${(blob.size / 1024).toFixed(1)} KB)</p>
+                        <audio controls autoplay src="${url}"></audio>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<p style="color:#ef4444">Error: ${res.status}</p>`;
+                }
+            } catch (e) {
+                resultDiv.innerHTML = `<p style="color:#ef4444">Error: ${e.message}</p>`;
+            }
+        }
+
+        // STT Functions
+        async function transcribeAudio() {
+            const fileInput = document.getElementById('audio-file');
+            const resultDiv = document.getElementById('stt-result');
+
+            if (!fileInput.files.length) {
+                resultDiv.innerHTML = '<p style="color:#ef4444">Please select an audio file first</p>';
+                return;
+            }
+
+            if (!authToken) {
+                resultDiv.innerHTML = '<p style="color:#ef4444">Please login first</p>';
+                return;
+            }
+
+            resultDiv.innerHTML = '<p style="color:#f59e0b">⏳ Transcribing audio...</p>';
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            try {
+                const res = await fetch(`${API_BASE}/api/stt/transcribe`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${authToken}` },
+                    body: formData
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    resultDiv.innerHTML = `
+                        <p style="color:#10b981">✓ Transcription complete!</p>
+                        <div class="response" style="display:block">${data.text || data.transcription || JSON.stringify(data)}</div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<p style="color:#ef4444">Error: ${res.status}</p>`;
+                }
+            } catch (e) {
+                resultDiv.innerHTML = `<p style="color:#ef4444">Error: ${e.message}</p>`;
+            }
+        }
+
+        // Health Check
+        async function checkHealth() {
+            const resultDiv = document.getElementById('health-response');
+            resultDiv.style.display = 'block';
+            resultDiv.textContent = 'Checking services...';
+
+            try {
+                const res = await fetch(`${API_BASE}/health`, { mode: 'cors' });
+                const data = await res.json();
+                showResponse('health-response', {
+                    status: 'API Gateway Healthy ✓',
+                    endpoint: API_BASE,
+                    response: data
+                });
+            } catch (e) {
+                // CORS error from localhost - show helpful message
+                showResponse('health-response', {
+                    note: 'CORS blocks health check from localhost',
+                    workaround: 'Services work normally when logged in',
+                    endpoint: API_BASE,
+                    tip: 'Test by using Register/Login above'
+                }, false);
+            }
+        }
+
+
+        // Initialize
+        checkHealth();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,5 @@
+CREATE DATABASE user_db;
+CREATE DATABASE chat_db;
+CREATE DATABASE document_db;
+CREATE DATABASE quiz_db;
+CREATE DATABASE stt_db;

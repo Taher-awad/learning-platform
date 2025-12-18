@@ -1,0 +1,33 @@
+# Environment files
+.env
+.env.local
+.env.*.local
+*.env
+.secrets_config
+
+# OS Metadata
+.DS_Store
+Thumbs.db
+
+# Logs and databases
+*.log
+*.sqlite
+
+# Dependency directories
+node_modules/
+venv/
+__pycache__/
+*.pyc
+
+# IDE settings
+.vscode/
+.idea/
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+package-lock.json
+
+# Exclude export folder itself if needed
+export_clean/
