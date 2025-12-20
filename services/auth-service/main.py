@@ -12,7 +12,7 @@ from sqlalchemy.orm import sessionmaker
 from contextlib import asynccontextmanager
 
 class Settings(BaseSettings):
-    DATABASE_URL: str = "postgresql://dbadmin:ChangeMe123@learning-platform-user-db.cenk4a2ywbwo.us-east-1.rds.amazonaws.com:5432/userdb?sslmode=require"
+    DATABASE_URL: str = "postgresql://dbadmin:ChangeMe123@learning-platform-db.cenk4a2ywbwo.us-east-1.rds.amazonaws.com:5432/userdb?sslmode=require"
     JWT_SECRET: str = "secret"
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRES_HOURS: int = 24
@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 settings = Settings()
+print(f"DEBUG: Using DATABASE_URL={settings.DATABASE_URL.replace('ChangeMe123', '***')}")
 
 # Database setup
 Base = declarative_base()
