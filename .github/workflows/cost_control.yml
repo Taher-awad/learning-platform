@@ -1,0 +1,77 @@
+name: Cost Control (Pause/Resume)
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'pause'
+        type: choice
+        options:
+        - pause
+        - resume
+
+env:
+  AWS_REGION: us-east-1
+  CLUSTER_NAME: learning-platform-cluster
+  ASG_NAME: learning-platform-asg
+  DB_IDENTIFIER: learning-platform-db
+
+jobs:
+  manage-resources:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: PAUSE Resources
+      if: ${{ inputs.action == 'pause' }}
+      run: |
+        echo "PAUSING RESOURCES..."
+        
+        # 1. Stop ECS Services
+        SERVICES="auth-service chat-service document-service quiz-service tts-service stt-service api-gateway kafka zookeeper"
+        for svc in $SERVICES; do
+          echo "Stopping service $svc..."
+          aws ecs update-service --cluster ${{ env.CLUSTER_NAME }} --service $svc --desired-count 0 || true
+        done
+        
+        # 2. Scale ASG to 0
+        echo "Scaling ASG to 0..."
+        aws autoscaling update-auto-scaling-group --auto-scaling-group-name ${{ env.ASG_NAME }} \
+          --min-size 0 --max-size 0 --desired-capacity 0
+          
+        # 3. Stop RDS
+        echo "Stopping RDS..."
+        aws rds stop-db-instance --db-instance-identifier ${{ env.DB_IDENTIFIER }} || echo "RDS stop command failed (maybe already stopped)"
+
+    - name: RESUME Resources (Budget Friendly)
+      if: ${{ inputs.action == 'resume' }}
+      run: |
+        echo "RESUMING RESOURCES..."
+        
+        # 1. Start RDS
+        echo "Starting RDS..."
+        aws rds start-db-instance --db-instance-identifier ${{ env.DB_IDENTIFIER }} || echo "RDS start command failed (maybe already running)"
+        echo "Waiting for RDS to be available (this may take time)..."
+        aws rds wait db-instance-available --db-instance-identifier ${{ env.DB_IDENTIFIER }}
+        
+        # 2. Scale ASG to 4 (Cost Optimized)
+        echo "Scaling ASG to 4..."
+        aws autoscaling update-auto-scaling-group --auto-scaling-group-name ${{ env.ASG_NAME }} \
+          --min-size 1 --max-size 5 --desired-capacity 4
+          
+        echo "Waiting 60s for EC2 startup..."
+        sleep 60
+        
+        # 3. Start ECS Services
+        SERVICES="kafka zookeeper auth-service chat-service document-service quiz-service tts-service stt-service api-gateway"
+        for svc in $SERVICES; do
+          echo "Starting service $svc..."
+          aws ecs update-service --cluster ${{ env.CLUSTER_NAME }} --service $svc --desired-count 1
+        done
