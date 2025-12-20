@@ -32,7 +32,7 @@ fi
 # We use 4 instances as calculated to fit "1-5$ a day" budget ($4/day) while supporting 9 services.
 echo "[2/3] Scaling Auto Scaling Group to 4 (Cost Optimized)..."
 aws autoscaling update-auto-scaling-group --auto-scaling-group-name $ASG_NAME \
-    --min-size 1 --max-size 5 --desired-capacity 4
+    --min-size 1 --max-size 5 --desired-capacity 5
 echo "ASG scaled to 4. Waiting for instances to join cluster..."
 
 # Simple wait loop

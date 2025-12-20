@@ -62,9 +62,9 @@ jobs:
         aws rds wait db-instance-available --db-instance-identifier ${{ env.DB_IDENTIFIER }}
         
         # 2. Scale ASG to 4 (Cost Optimized)
-        echo "Scaling ASG to 4..."
+        echo "Scaling ASG to 5..."
         aws autoscaling update-auto-scaling-group --auto-scaling-group-name ${{ env.ASG_NAME }} \
-          --min-size 1 --max-size 5 --desired-capacity 4
+          --min-size 1 --max-size 5 --desired-capacity 5
           
         echo "Waiting 60s for EC2 startup..."
         sleep 60
