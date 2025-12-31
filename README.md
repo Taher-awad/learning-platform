@@ -73,10 +73,4 @@ Run the entire platform on your machine:
 docker-compose up --build
 ```
 
-### Access Points
-- **Frontend**: [S3 Website URL](http://learning-platform-frontend-593223146892.s3-website-us-east-1.amazonaws.com/)
-- **API GATEWAY**: `http://learning-platform-alb-328625304.us-east-1.elb.amazonaws.com/health`
-- **OpenAPI Docs**: `/api/[service]/docs` (Requires JWT)
 
----
-*Developed for Phase 3 - Final Submission 2025*
